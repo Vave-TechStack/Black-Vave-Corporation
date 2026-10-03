@@ -49,10 +49,10 @@ export default function TermsPage() {
 
       <h2>5. No Warranties</h2>
       <p>
-        The information on this website is provided on an "as is" basis without any
-        representations or warranties of any kind, whether express or implied. We
-        do not warrant that the website will be available at all times or free from
-        errors or viruses.
+        The information on this website is provided on an &quot;as is&quot;
+        basis without any representations or warranties of any kind, whether
+        express or implied. We do not warrant that the website will be
+        available at all times or free from errors or viruses.
       </p>
 
       <h2>6. Governing Law</h2>

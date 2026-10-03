@@ -16,11 +16,11 @@ export default function PrivacyPage() {
     >
       <h2>1. Introduction</h2>
       <p>
-        BLACK VAVE CORPORATION PRIVATE LIMITED ("BLACK VAVE," "we," "us") respects
-        your privacy and is committed to protecting the personal information you
-        share with us. This Privacy Policy explains how we collect, use, disclose,
-        and safeguard your information when you visit our website or interact with
-        our services.
+        BLACK VAVE CORPORATION PRIVATE LIMITED (&quot;BLACK VAVE,&quot;
+        &quot;we,&quot; &quot;us&quot;) respects your privacy and is committed
+        to protecting the personal information you share with us. This Privacy
+        Policy explains how we collect, use, disclose, and safeguard your
+        information when you visit our website or interact with our services.
       </p>
 
       <h2>2. Information We Collect</h2>

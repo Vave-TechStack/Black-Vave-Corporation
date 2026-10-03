@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, AlertCircle } from "lucide-react";
 
 const contactSchema = z.object({
   name: z.string().min(2, "Please enter your name"),
@@ -14,11 +14,10 @@ const contactSchema = z.object({
     .string()
     .optional()
     .refine((v) => !v || /^[+\d][\d\s-]{6,}$/.test(v), "Please enter a valid phone number"),
-  country: z.string().optional(),
-  service: z.string(),
-  projectType: z.string(),
-  budget: z.string(),
+  service: z.string().min(1, "Please select a service"),
+  budget: z.string().optional(),
   message: z.string().min(10, "Please tell us a little more about your project"),
+  honeypot: z.string().optional(),
 });
 
 type ContactFormData = z.infer<typeof contactSchema>;
@@ -34,16 +33,6 @@ const services = [
   "Other",
 ];
 
-const projectTypes = [
-  "New Project",
-  "Application Modernization",
-  "AI / Automation Initiative",
-  "Cloud Migration",
-  "Digital Platform",
-  "Consulting / Strategy",
-  "Other",
-];
-
 const budgets = [
   "Under $10K",
   "$10K – $25K",
@@ -53,8 +42,12 @@ const budgets = [
   "Not sure yet",
 ];
 
+type SubmissionState = "idle" | "submitting" | "success" | "error";
+
 export function ContactForm() {
-  const [submitted, setSubmitted] = useState(false);
+  const [state, setState] = useState<SubmissionState>("idle");
+  const [serverMessage, setServerMessage] = useState("");
+  const [delivered, setDelivered] = useState(false);
   const {
     register,
     handleSubmit,
@@ -63,31 +56,72 @@ export function ContactForm() {
     resolver: zodResolver(contactSchema),
     defaultValues: {
       service: "",
-      projectType: "",
-      budget: "",
+      honeypot: "",
     },
   });
 
   const onSubmit = async (data: ContactFormData) => {
-    // Simulated submission - in production this would POST to a secure API endpoint
-    await new Promise((r) => setTimeout(r, 600));
-    console.log("Contact submission:", data);
-    setSubmitted(true);
+    setState("submitting");
+    setServerMessage("");
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        setState("error");
+        setServerMessage(
+          result.message ||
+            "Something went wrong. Please try again or email us directly."
+        );
+        return;
+      }
+
+      setDelivered(Boolean(result.delivered));
+      setState("success");
+    } catch {
+      setState("error");
+      setServerMessage(
+        "We could not reach our server. Please try again or email us directly."
+      );
+    }
   };
 
-  if (submitted) {
+  if (state === "success") {
     return (
-      <div className="flex flex-col items-center justify-center text-center p-12 border border-accent/30 bg-accent/5 rounded-sm">
+      <div
+        className="flex flex-col items-center justify-center text-center p-12 border border-accent/30 bg-accent/5 rounded-sm"
+        role="status"
+      >
         <div className="w-16 h-16 rounded-full bg-accent/10 border border-accent/30 flex items-center justify-center mb-6">
           <CheckCircle2 className="w-8 h-8 text-accent" />
         </div>
         <h3 className="text-2xl font-heading font-bold text-text mb-3">
           Thank You
         </h3>
-        <p className="text-text-muted max-w-md">
-          Your message has been received. A member of our team will get back to
-          you shortly to discuss your project.
-        </p>
+        {delivered ? (
+          <p className="text-text-muted max-w-md">
+            Your message has been sent. A member of our team will get back to
+            you shortly to discuss your project.
+          </p>
+        ) : (
+          <p className="text-text-muted max-w-md">
+            Your enquiry was received. Email delivery is being configured on
+            our side — for urgent requests, please contact us directly at{" "}
+            <a
+              href="mailto:contact@blackvave.com"
+              className="text-accent hover:text-accent-light underline underline-offset-2"
+            >
+              contact@blackvave.com
+            </a>
+            .
+          </p>
+        )}
       </div>
     );
   }
@@ -99,10 +133,20 @@ export function ContactForm() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-6">
+      {state === "error" && (
+        <div
+          role="alert"
+          className="flex items-start gap-3 p-4 border border-error/40 bg-error/10 rounded-sm"
+        >
+          <AlertCircle className="w-5 h-5 text-error shrink-0 mt-0.5" />
+          <p className="text-sm text-text">{serverMessage}</p>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <label htmlFor="name" className={labelClasses}>
-            Name <span className="text-accent">*</span>
+            Full Name <span className="text-accent">*</span>
           </label>
           <input
             id="name"
@@ -111,9 +155,14 @@ export function ContactForm() {
             placeholder="Your full name"
             className={inputClasses}
             aria-invalid={!!errors.name}
+            aria-describedby={errors.name ? "name-error" : undefined}
             {...register("name")}
           />
-          {errors.name && <p className={errorClasses}>{errors.name.message}</p>}
+          {errors.name && (
+            <p id="name-error" className={errorClasses}>
+              {errors.name.message}
+            </p>
+          )}
         </div>
         <div>
           <label htmlFor="email" className={labelClasses}>
@@ -126,16 +175,21 @@ export function ContactForm() {
             placeholder="you@company.com"
             className={inputClasses}
             aria-invalid={!!errors.email}
+            aria-describedby={errors.email ? "email-error" : undefined}
             {...register("email")}
           />
-          {errors.email && <p className={errorClasses}>{errors.email.message}</p>}
+          {errors.email && (
+            <p id="email-error" className={errorClasses}>
+              {errors.email.message}
+            </p>
+          )}
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <label htmlFor="company" className={labelClasses}>
-            Company
+            Company Name
           </label>
           <input
             id="company"
@@ -148,7 +202,7 @@ export function ContactForm() {
         </div>
         <div>
           <label htmlFor="phone" className={labelClasses}>
-            Phone
+            Phone Number
           </label>
           <input
             id="phone"
@@ -157,64 +211,51 @@ export function ContactForm() {
             placeholder="+1 555 000 0000 (optional)"
             className={inputClasses}
             aria-invalid={!!errors.phone}
+            aria-describedby={errors.phone ? "phone-error" : undefined}
             {...register("phone")}
           />
-          {errors.phone && <p className={errorClasses}>{errors.phone.message}</p>}
+          {errors.phone && (
+            <p id="phone-error" className={errorClasses}>
+              {errors.phone.message}
+            </p>
+          )}
         </div>
-      </div>
-
-      <div>
-        <label htmlFor="country" className={labelClasses}>
-          Country
-        </label>
-        <input
-          id="country"
-          type="text"
-          autoComplete="country-name"
-          placeholder="Your country (optional)"
-          className={inputClasses}
-          {...register("country")}
-        />
-      </div>
-
-      <div>
-        <label htmlFor="service" className={labelClasses}>
-          Service Interested In <span className="text-accent">*</span>
-        </label>
-        <select id="service" className={inputClasses} {...register("service")}>
-          <option value="">Select a service</option>
-          {services.map((s) => (
-            <option key={s} value={s}>
-              {s}
-            </option>
-          ))}
-        </select>
-        {errors.service && <p className={errorClasses}>{errors.service.message}</p>}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <label htmlFor="projectType" className={labelClasses}>
-            Project Type
+          <label htmlFor="service" className={labelClasses}>
+            Service of Interest <span className="text-accent">*</span>
           </label>
-          <select id="projectType" className={inputClasses} {...register("projectType")}>
-            <option value="">Select project type</option>
-            {projectTypes.map((t) => (
-              <option key={t} value={t}>
-                {t}
+          <select
+            id="service"
+            className={inputClasses}
+            aria-invalid={!!errors.service}
+            aria-describedby={errors.service ? "service-error" : undefined}
+            {...register("service")}
+          >
+            <option value="">Select a service</option>
+            {services.map((service) => (
+              <option key={service} value={service}>
+                {service}
               </option>
             ))}
           </select>
+          {errors.service && (
+            <p id="service-error" className={errorClasses}>
+              {errors.service.message}
+            </p>
+          )}
         </div>
         <div>
           <label htmlFor="budget" className={labelClasses}>
-            Budget Range
+            Project Budget
           </label>
           <select id="budget" className={inputClasses} {...register("budget")}>
-            <option value="">Select budget range</option>
-            {budgets.map((b) => (
-              <option key={b} value={b}>
-                {b}
+            <option value="">Select budget range (optional)</option>
+            {budgets.map((budget) => (
+              <option key={budget} value={budget}>
+                {budget}
               </option>
             ))}
           </select>
@@ -223,7 +264,7 @@ export function ContactForm() {
 
       <div>
         <label htmlFor="message" className={labelClasses}>
-          Message <span className="text-accent">*</span>
+          Project Description <span className="text-accent">*</span>
         </label>
         <textarea
           id="message"
@@ -231,9 +272,26 @@ export function ContactForm() {
           placeholder="Tell us about your project, goals and timeline..."
           className={`${inputClasses} resize-y`}
           aria-invalid={!!errors.message}
+          aria-describedby={errors.message ? "message-error" : undefined}
           {...register("message")}
         />
-        {errors.message && <p className={errorClasses}>{errors.message.message}</p>}
+        {errors.message && (
+          <p id="message-error" className={errorClasses}>
+            {errors.message.message}
+          </p>
+        )}
+      </div>
+
+      {/* Honeypot: hidden from users, traps automated spam */}
+      <div className="hidden" aria-hidden="true">
+        <label htmlFor="honeypot">Leave this field empty</label>
+        <input
+          id="honeypot"
+          type="text"
+          tabIndex={-1}
+          autoComplete="off"
+          {...register("honeypot")}
+        />
       </div>
 
       <button

@@ -1,7 +1,18 @@
-import Link from "next/link";
-import { ArrowLeft, ArrowUpRight } from "lucide-react";
+"use client";
 
-export default function NotFound() {
+import { useEffect } from "react";
+
+export default function Error({
+  error,
+  reset,
+}: {
+  error: Error & { digest?: string };
+  reset: () => void;
+}) {
+  useEffect(() => {
+    console.error("[bvc] Application error:", error.message);
+  }, [error]);
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-primary relative overflow-hidden">
       <div
@@ -13,29 +24,28 @@ export default function NotFound() {
         aria-hidden="true"
       />
       <div className="relative container-main text-center py-32">
-        <p className="font-mono text-accent text-xl mb-4">404</p>
-        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-text text-balance max-w-2xl mx-auto">
-          This Page Is Beyond Our Reach
+        <p className="font-mono text-accent text-xl mb-4">Error</p>
+        <h1 className="text-4xl md:text-5xl font-bold text-text text-balance max-w-2xl mx-auto">
+          Something Went Wrong
         </h1>
         <p className="mt-6 text-lg text-text-muted max-w-xl mx-auto">
-          The page you&apos;re looking for doesn&apos;t exist or has been
-          moved. Let&apos;s get you back on track.
+          An unexpected error occurred. Your information is safe — please
+          try again.
         </p>
         <div className="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
-          <Link
-            href="/"
+          <button
+            type="button"
+            onClick={reset}
             className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-accent text-primary font-semibold rounded-sm hover:bg-accent-light transition-colors duration-300"
           >
-            <ArrowLeft className="w-5 h-5" />
-            Back to Home
-          </Link>
-          <Link
+            Try Again
+          </button>
+          <a
             href="/contact"
             className="inline-flex items-center justify-center gap-2 px-8 py-4 border border-border-light text-text font-semibold rounded-sm hover:border-accent hover:text-accent transition-colors duration-300"
           >
-            Contact Us
-            <ArrowUpRight className="w-5 h-5" />
-          </Link>
+            Contact Support
+          </a>
         </div>
       </div>
     </div>

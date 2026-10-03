@@ -22,10 +22,6 @@ export function Header() {
   }, []);
 
   useEffect(() => {
-    setMobileOpen(false);
-  }, [pathname]);
-
-  useEffect(() => {
     document.body.style.overflow = mobileOpen ? "hidden" : "";
     return () => {
       document.body.style.overflow = "";
@@ -123,6 +119,7 @@ export function Header() {
                     >
                       <Link
                         href={item.href}
+                        onClick={() => setMobileOpen(false)}
                         className={cn(
                           "flex items-center justify-between py-4 border-b border-border text-xl font-heading transition-colors",
                           isActive ? "text-accent" : "text-text hover:text-accent"
@@ -137,6 +134,7 @@ export function Header() {
               </ul>
               <Link
                 href="/contact"
+                onClick={() => setMobileOpen(false)}
                 className="mt-8 inline-flex items-center justify-center gap-2 w-full px-6 py-4 bg-accent text-primary font-semibold rounded-sm"
               >
                 Talk to Our Experts

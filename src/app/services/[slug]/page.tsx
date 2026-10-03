@@ -1,12 +1,19 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, CheckCircle2, Boxes, TrendingUp, ArrowUpRight } from "lucide-react";
-import { PageHero } from "@/components/ui/page-hero";
-import { Breadcrumbs } from "@/components/ui/breadcrumbs";
-import { Reveal } from "@/components/ui/reveal";
-import { services } from "@/data/services";
-import { CTASection } from "@/components/cta-section";
+import { services, getService, getRelatedServices } from "@/data/services";
+import { ServiceHero } from "@/components/services/service-hero";
+import { ServiceChallenges } from "@/components/services/service-challenges";
+import { ServiceApproach } from "@/components/services/service-approach";
+import { ServiceDetailVisual } from "@/components/services/service-detail-visuals";
+import { ServiceCapabilities } from "@/components/services/service-capabilities";
+import { ServiceUseCases } from "@/components/services/service-use-cases";
+import { ServicePerspectives } from "@/components/services/service-perspectives";
+import { ServiceTechnologyStack } from "@/components/services/service-technology-stack";
+import { ServiceOutcomes } from "@/components/services/service-outcomes";
+import { ServiceEngagementModels } from "@/components/services/service-engagement-models";
+import { ServiceFAQ } from "@/components/services/service-faq";
+import { RelatedServices } from "@/components/services/related-services";
+import { ServiceCTA } from "@/components/services/service-cta";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -18,148 +25,118 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const service = services.find((s) => s.slug === slug);
+  const service = getService(slug);
   if (!service) return {};
+
+  const canonical = `/services/${service.slug}`;
+
   return {
-    title: service.title,
-    description: service.description,
-    alternates: { canonical: `/services/${service.slug}` },
+    title: `${service.title} Services`,
+    description: service.metaDescription,
+    alternates: { canonical },
+    openGraph: {
+      title: `${service.title} Services`,
+      description: service.metaDescription,
+      type: "website",
+      url: canonical,
+      images: [
+        {
+          url: "/og-image.png",
+          width: 1200,
+          height: 630,
+          alt: `${service.title} — BLACK VAVE CORPORATION`,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${service.title} Services`,
+      description: service.metaDescription,
+      images: ["/og-image.png"],
+    },
+  };
+}
+
+function buildFaqSchema(service: NonNullable<ReturnType<typeof getService>>) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: service.faqs.map((faq) => ({
+      "@type": "Question",
+      name: faq.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: faq.answer,
+      },
+    })),
+  };
+}
+
+function buildBreadcrumbSchema(
+  service: NonNullable<ReturnType<typeof getService>>
+) {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.blackvave.com";
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: siteUrl,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Services",
+        item: `${siteUrl}/services`,
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: service.title,
+        item: `${siteUrl}/services/${service.slug}`,
+      },
+    ],
   };
 }
 
 export default async function ServiceDetailPage({ params }: Props) {
   const { slug } = await params;
-  const service = services.find((s) => s.slug === slug);
+  const service = getService(slug);
   if (!service) notFound();
+
+  const related = getRelatedServices(service);
+  const faqSchema = buildFaqSchema(service);
+  const breadcrumbSchema = buildBreadcrumbSchema(service);
 
   return (
     <>
-      <PageHero
-        eyebrow="Service"
-        title={service.title}
-        description={service.tagline}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
 
-      <div className="container-main pb-4">
-        <Breadcrumbs
-          items={[{ label: "Services", href: "/services" }, { label: service.title }]}
-        />
-      </div>
-
-      <section className="py-10 md:py-14 bg-primary">
-        <div className="container-main">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
-            <div>
-              <Reveal>
-                <h2 className="text-2xl md:text-3xl font-bold text-text mb-6 text-balance">
-                  Overview
-                </h2>
-                <p className="text-lg text-text-muted leading-relaxed mb-8">
-                  {service.description}
-                </p>
-              </Reveal>
-
-              <Reveal delay={0.1}>
-                <h3 className="text-xl font-semibold text-text mb-4">The Problem</h3>
-                <p className="text-base text-text-muted leading-relaxed mb-8">
-                  {service.problem}
-                </p>
-              </Reveal>
-
-              <Reveal delay={0.2}>
-                <h3 className="text-xl font-semibold text-text mb-4">Our Approach</h3>
-                <p className="text-base text-text-muted leading-relaxed">
-                  {service.solution}
-                </p>
-              </Reveal>
-            </div>
-
-            <div className="space-y-8">
-              <Reveal delay={0.1}>
-                <div className="p-8 border border-border bg-secondary rounded-sm">
-                  <div className="flex items-center gap-3 mb-6">
-                    <Boxes className="w-6 h-6 text-accent" />
-                    <h3 className="text-xl font-heading font-semibold text-text">
-                      Capabilities
-                    </h3>
-                  </div>
-                  <ul className="grid grid-cols-1 gap-3">
-                    {service.capabilities.map((cap) => (
-                      <li key={cap} className="flex items-start gap-3">
-                        <CheckCircle2 className="w-5 h-5 text-accent shrink-0 mt-0.5" />
-                        <span className="text-sm text-text-muted">{cap}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </Reveal>
-
-              <Reveal delay={0.2}>
-                <div className="p-8 border border-border bg-secondary rounded-sm">
-                  <div className="flex items-center gap-3 mb-6">
-                    <TrendingUp className="w-6 h-6 text-accent" />
-                    <h3 className="text-xl font-heading font-semibold text-text">
-                      Business Outcome
-                    </h3>
-                  </div>
-                  <p className="text-sm text-text-muted leading-relaxed">
-                    {service.outcome}
-                  </p>
-                </div>
-              </Reveal>
-
-              <Reveal delay={0.3}>
-                <div className="p-8 border border-border bg-secondary rounded-sm">
-                  <h3 className="text-xl font-heading font-semibold text-text mb-5">
-                    Technology
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {service.technologies.map((tech) => (
-                      <span
-                        key={tech}
-                        className="px-3 py-1.5 text-xs text-text-muted border border-border rounded-full"
-                      >
-                        {tech}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </Reveal>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="py-12 bg-primary">
-        <div className="container-main">
-          <Reveal>
-            <div className="flex items-center justify-between flex-wrap gap-4">
-              <Link
-                href="/services"
-                className="inline-flex items-center gap-2 text-text-muted hover:text-accent transition-colors"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                Back to All Services
-              </Link>
-              <Link
-                href="/contact"
-                className="inline-flex items-center gap-2 text-accent font-semibold hover:gap-3 transition-all group"
-              >
-                Discuss This Service
-                <ArrowUpRight className="w-5 h-5 transition-transform group-hover:translate-x-0.5" />
-              </Link>
-            </div>
-          </Reveal>
-        </div>
-      </section>
-
-      <CTASection
-        title={`Discuss Your ${service.title} Project`}
-        description="Talk to our experts about how this capability could apply to your organization's specific challenges."
-        primaryLabel="Talk to an Expert"
-        secondaryLabel="Explore All Services"
-        secondaryHref="/services"
-      />
+      <ServiceHero service={service} />
+      <ServiceChallenges service={service} />
+      <ServiceApproach service={service} />
+      <ServiceDetailVisual slug={service.slug} />
+      <ServiceCapabilities service={service} />
+      <ServiceUseCases service={service} />
+      {service.perspectives && service.perspectives.length > 0 && (
+        <ServicePerspectives perspectives={service.perspectives} />
+      )}
+      <ServiceTechnologyStack service={service} />
+      <ServiceOutcomes service={service} />
+      <ServiceEngagementModels service={service} />
+      <ServiceFAQ faqs={service.faqs} serviceTitle={service.title} />
+      <RelatedServices current={service} related={related} />
+      <ServiceCTA service={service} />
     </>
   );
 }
