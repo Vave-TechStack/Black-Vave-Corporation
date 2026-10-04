@@ -81,7 +81,7 @@ export default function ContactPage() {
                       {method.href ? (
                         <a
                           href={method.href}
-                          className="text-text font-medium hover:text-accent transition-colors"
+                          className="inline-block py-1 text-text font-medium hover:text-accent transition-colors"
                         >
                           {method.value}
                         </a>

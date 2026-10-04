@@ -36,7 +36,7 @@ export function Hero() {
           </motion.div>
 
           <motion.h1
-            className="mt-8 text-5xl sm:text-6xl md:text-7xl lg:text-[72px] xl:text-[84px] font-bold text-text leading-[1.05] tracking-tight text-balance"
+            className="mt-8 text-[43px] sm:text-[55px] md:text-[67px] lg:text-[67px] xl:text-[79px] font-bold text-text leading-[1.05] tracking-tight text-balance"
             initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
@@ -50,7 +50,7 @@ export function Hero() {
           </motion.h1>
 
           <motion.p
-            className="mt-8 text-lg md:text-xl text-text-muted leading-relaxed max-w-2xl"
+            className="mt-8 text-[13px] md:text-[15px] text-text-muted leading-relaxed max-w-2xl"
             initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}

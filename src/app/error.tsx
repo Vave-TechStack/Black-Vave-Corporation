@@ -25,7 +25,7 @@ export default function Error({
       />
       <div className="relative container-main text-center py-32">
         <p className="font-mono text-accent text-xl mb-4">Error</p>
-        <h1 className="text-4xl md:text-5xl font-bold text-text text-balance max-w-2xl mx-auto">
+        <h1 className="text-[31px] md:text-[43px] font-bold text-text text-balance max-w-2xl mx-auto">
           Something Went Wrong
         </h1>
         <p className="mt-6 text-lg text-text-muted max-w-xl mx-auto">

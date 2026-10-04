@@ -76,7 +76,7 @@ export default async function ArticlePage({ params }: Props) {
               </span>
               <span className="text-sm text-text-dim">{article.readTime}</span>
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-text leading-tight text-balance">
+            <h1 className="text-[31px] md:text-[43px] font-bold text-text leading-tight text-balance">
               {article.title}
             </h1>
             <div className="mt-6 flex items-center gap-4 text-sm text-text-dim">

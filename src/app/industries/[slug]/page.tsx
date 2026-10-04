@@ -1,12 +1,19 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, CheckCircle2, Boxes, TrendingUp, ArrowUpRight } from "lucide-react";
-import { PageHero } from "@/components/ui/page-hero";
-import { Breadcrumbs } from "@/components/ui/breadcrumbs";
-import { Reveal } from "@/components/ui/reveal";
-import { industries } from "@/data/industries";
-import { CTASection } from "@/components/cta-section";
+import { getIndustry, getRelatedIndustries, industries } from "@/data/industries";
+import { IndustryHero } from "@/components/industries/industry-hero";
+import { IndustryChallenges } from "@/components/industries/industry-challenges";
+import { IndustryProducts } from "@/components/industries/industry-products";
+import { IndustryServices } from "@/components/industries/industry-services";
+import { IndustryApproach } from "@/components/industries/industry-approach";
+import { IndustryUseCases } from "@/components/industries/industry-use-cases";
+import { IndustryTechnology } from "@/components/industries/industry-technology";
+import { IndustryOutcomes } from "@/components/industries/industry-outcomes";
+import { IndustryEngagement } from "@/components/industries/industry-engagement";
+import { IndustryFAQ } from "@/components/industries/industry-faq";
+import { RelatedIndustries } from "@/components/industries/related-industries";
+import { IndustryCTA } from "@/components/industries/industry-cta";
+import { IndustryTheme } from "@/components/industries/industry-theme";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -18,157 +25,137 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const industry = industries.find((i) => i.slug === slug);
+  const industry = getIndustry(slug);
   if (!industry) return {};
+
+  const canonical = `/industries/${industry.slug}`;
+  const title = `${industry.title} Technology Solutions`;
+
   return {
-    title: `${industry.title} Solutions`,
-    description: industry.description,
-    alternates: { canonical: `/industries/${industry.slug}` },
+    title,
+    description: industry.metaDescription,
+    alternates: { canonical },
+    openGraph: {
+      title,
+      description: industry.metaDescription,
+      type: "website",
+      url: canonical,
+      images: [
+        {
+          url: "/og-image.png",
+          width: 1200,
+          height: 630,
+          alt: `${industry.title} — BLACK VAVE CORPORATION`,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description: industry.metaDescription,
+      images: ["/og-image.png"],
+    },
+  };
+}
+
+function buildFaqSchema(industry: NonNullable<ReturnType<typeof getIndustry>>) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: industry.faqs.map((faq) => ({
+      "@type": "Question",
+      name: faq.question,
+      acceptedAnswer: { "@type": "Answer", text: faq.answer },
+    })),
+  };
+}
+
+function buildBreadcrumbSchema(industry: NonNullable<ReturnType<typeof getIndustry>>) {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.blackvave.com";
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: siteUrl },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Industries",
+        item: `${siteUrl}/industries`,
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: industry.title,
+        item: `${siteUrl}/industries/${industry.slug}`,
+      },
+    ],
+  };
+}
+
+function buildServiceSchema(industry: NonNullable<ReturnType<typeof getIndustry>>) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    name: `${industry.title} Technology Solutions`,
+    description: industry.metaDescription,
+    provider: {
+      "@type": "Organization",
+      name: "BLACK VAVE CORPORATION PRIVATE LIMITED",
+      url: process.env.NEXT_PUBLIC_SITE_URL || "https://www.blackvave.com",
+    },
+    areaServed: "Worldwide",
+    hasOfferCatalog: {
+      "@type": "OfferCatalog",
+      name: `${industry.title} Products`,
+      itemListElement: industry.products.map((product) => ({
+        "@type": "Offer",
+        itemOffered: {
+          "@type": "Service",
+          name: product.title,
+          description: product.description,
+        },
+      })),
+    },
   };
 }
 
 export default async function IndustryDetailPage({ params }: Props) {
   const { slug } = await params;
-  const industry = industries.find((i) => i.slug === slug);
+  const industry = getIndustry(slug);
   if (!industry) notFound();
+
+  const related = getRelatedIndustries(industry);
 
   return (
     <>
-      <PageHero
-        eyebrow="Industry"
-        title={industry.title}
-        description={industry.description}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(buildFaqSchema(industry)) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(buildBreadcrumbSchema(industry)) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(buildServiceSchema(industry)) }}
       />
 
-      <div className="container-main pb-4">
-        <Breadcrumbs
-          items={[{ label: "Industries", href: "/industries" }, { label: industry.title }]}
-        />
-      </div>
-
-      <section className="py-10 md:py-14 bg-primary">
-        <div className="container-main">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
-            <div className="space-y-8">
-              <Reveal>
-                <div>
-                  <h2 className="text-2xl font-bold text-text mb-4">
-                    The Industry Challenge
-                  </h2>
-                  <p className="text-base text-text-muted leading-relaxed">
-                    {industry.challenge}
-                  </p>
-                </div>
-              </Reveal>
-
-              <Reveal delay={0.1}>
-                <div>
-                  <h2 className="text-2xl font-bold text-text mb-4">
-                    The BLACK VAVE Approach
-                  </h2>
-                  <p className="text-base text-text-muted leading-relaxed">
-                    {industry.approach}
-                  </p>
-                </div>
-              </Reveal>
-
-              <Reveal delay={0.2}>
-                <div className="p-8 border border-border bg-secondary rounded-sm">
-                  <div className="flex items-center gap-3 mb-6">
-                    <TrendingUp className="w-6 h-6 text-accent" />
-                    <h3 className="text-xl font-heading font-semibold text-text">
-                      Expected Outcomes
-                    </h3>
-                  </div>
-                  <ul className="grid grid-cols-1 gap-3">
-                    {industry.outcomes.map((outcome) => (
-                      <li key={outcome} className="flex items-start gap-3">
-                        <CheckCircle2 className="w-5 h-5 text-accent shrink-0 mt-0.5" />
-                        <span className="text-sm text-text-muted">{outcome}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </Reveal>
-            </div>
-
-            <div className="space-y-8">
-              <Reveal delay={0.1}>
-                <div className="p-8 border border-border bg-secondary rounded-sm">
-                  <div className="flex items-center gap-3 mb-6">
-                    <Boxes className="w-6 h-6 text-accent" />
-                    <h3 className="text-xl font-heading font-semibold text-text">
-                      Relevant Technology
-                    </h3>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {industry.technologies.map((tech) => (
-                      <span
-                        key={tech}
-                        className="px-3 py-1.5 text-xs text-text-muted border border-border rounded-full"
-                      >
-                        {tech}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </Reveal>
-
-              <Reveal delay={0.2}>
-                <div className="p-8 border border-border bg-secondary rounded-sm">
-                  <h3 className="text-xl font-heading font-semibold text-text mb-4">
-                    Explore Related Solutions
-                  </h3>
-                  <Link
-                    href="/solutions"
-                    className="inline-flex items-center gap-2 text-accent font-semibold hover:gap-3 transition-all group"
-                  >
-                    View Our Solutions
-                    <ArrowUpRight className="w-5 h-5 transition-transform group-hover:translate-x-0.5" />
-                  </Link>
-                </div>
-              </Reveal>
-
-              <Reveal delay={0.3}>
-                <Link
-                  href="/contact"
-                  className="group flex flex-col p-8 border border-accent/30 bg-accent/5 rounded-sm hover:bg-accent/10 transition-colors duration-300"
-                >
-                  <h3 className="text-xl font-heading font-semibold text-text mb-2">
-                    Talk to Our {industry.title} Team
-                  </h3>
-                  <p className="text-sm text-text-muted mb-4">
-                    Discuss how we can help your organization address its specific
-                    challenges with the right technology.
-                  </p>
-                  <span className="inline-flex items-center gap-2 text-accent font-semibold">
-                    Start a Conversation
-                    <ArrowUpRight className="w-5 h-5 transition-transform group-hover:translate-x-0.5" />
-                  </span>
-                </Link>
-              </Reveal>
-            </div>
-          </div>
-
-          <div className="mt-12">
-            <Reveal>
-              <Link
-                href="/industries"
-                className="inline-flex items-center gap-2 text-text-muted hover:text-accent transition-colors"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                Back to All Industries
-              </Link>
-            </Reveal>
-          </div>
-        </div>
-      </section>
-
-      <CTASection
-        title={`Transforming the ${industry.title} Sector`}
-        description="Talk to our team about how technology can help your organization modernize operations and achieve better outcomes."
-        primaryLabel="Talk to an Expert"
-      />
+      <IndustryTheme industry={industry}>
+        <IndustryHero industry={industry} />
+        <IndustryChallenges industry={industry} />
+        <IndustryProducts industry={industry} />
+        <IndustryServices industry={industry} />
+        <IndustryApproach industry={industry} />
+        <IndustryUseCases industry={industry} />
+        <IndustryTechnology industry={industry} />
+        <IndustryOutcomes industry={industry} />
+        <IndustryEngagement industry={industry} />
+        <IndustryFAQ faqs={industry.faqs} industryTitle={industry.title} />
+        <RelatedIndustries related={related} />
+        <IndustryCTA industry={industry} />
+      </IndustryTheme>
     </>
   );
 }

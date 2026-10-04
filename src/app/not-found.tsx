@@ -14,7 +14,7 @@ export default function NotFound() {
       />
       <div className="relative container-main text-center py-32">
         <p className="font-mono text-accent text-xl mb-4">404</p>
-        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-text text-balance max-w-2xl mx-auto">
+        <h1 className="text-[31px] md:text-[43px] lg:text-[55px] font-bold text-text text-balance max-w-2xl mx-auto">
           This Page Is Beyond Our Reach
         </h1>
         <p className="mt-6 text-lg text-text-muted max-w-xl mx-auto">

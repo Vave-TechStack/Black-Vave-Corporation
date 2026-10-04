@@ -30,11 +30,11 @@ export function PageHero({ eyebrow, title, description }: PageHeroProps) {
         <p className="text-accent text-sm font-semibold uppercase tracking-[0.2em] mb-4">
           {eyebrow}
         </p>
-        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-text max-w-4xl leading-tight text-balance">
+        <h1 className="text-[31px] md:text-[43px] lg:text-[55px] font-bold text-text max-w-4xl leading-tight text-balance">
           {title}
         </h1>
         {description && (
-          <p className="mt-6 text-lg md:text-xl text-text-muted max-w-3xl leading-relaxed">
+          <p className="mt-6 text-[13px] md:text-[15px] text-text-muted max-w-3xl leading-relaxed">
             {description}
           </p>
         )}

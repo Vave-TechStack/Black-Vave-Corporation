@@ -45,7 +45,7 @@ export function CaseStudiesSection() {
                 </p>
                 <Link
                   href="/contact"
-                  className="inline-flex items-center gap-2 mt-6 text-accent text-sm font-semibold hover:gap-3 transition-all"
+                  className="inline-flex items-center gap-2 mt-6 py-1 text-accent text-sm font-semibold hover:gap-3 transition-all"
                 >
                   Discuss Your Project
                   <ArrowUpRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />

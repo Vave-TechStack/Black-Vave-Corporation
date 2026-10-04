@@ -29,7 +29,7 @@ export function Logo({ className, showText = true }: LogoProps) {
           <span className="font-heading text-lg md:text-xl font-bold text-text tracking-tight">
             BLACK VAVE
           </span>
-          <span className="text-[10px] md:text-[11px] text-text-muted font-medium tracking-[0.2em] uppercase">
+          <span className="text-[11px] text-text-muted font-medium tracking-[0.2em] uppercase">
             Corporation
           </span>
         </div>

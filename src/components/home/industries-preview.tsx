@@ -17,11 +17,7 @@ const iconMap: Record<string, LucideIcon> = {
   Globe,
 };
 
-const featured = ["Healthcare", "Education", "Financial Services", "Retail & E-commerce", "Publishing", "Manufacturing"];
-
 export function IndustriesPreview() {
-  const featuredIndustries = industries.filter((i) => featured.includes(i.title));
-
   return (
     <section className="py-20 md:py-28 bg-primary">
       <div className="container-main">
@@ -49,17 +45,17 @@ export function IndustriesPreview() {
           </div>
         </Reveal>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-px bg-border border border-border">
-          {featuredIndustries.map((industry, index) => {
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-px bg-border border border-border">
+          {industries.map((industry, index) => {
             const Icon = iconMap[industry.icon] ?? Globe;
             return (
               <Reveal key={industry.slug} delay={index * 0.05}>
                 <Link
                   href={`/industries/${industry.slug}`}
-                  className="group flex flex-col items-center justify-center text-center gap-4 p-8 bg-primary hover:bg-surface transition-colors duration-300 min-h-[160px]"
+                  className="group flex flex-col items-center justify-center text-center gap-4 p-4 sm:p-6 lg:p-8 bg-primary hover:bg-surface transition-colors duration-300 min-h-[160px]"
                 >
                   <Icon className="w-8 h-8 text-accent transition-transform group-hover:scale-110 duration-300" />
-                  <span className="text-sm font-medium text-text group-hover:text-accent transition-colors duration-300">
+                  <span className="text-sm font-medium text-text group-hover:text-accent transition-colors duration-300 break-words hyphens-auto">
                     {industry.title}
                   </span>
                 </Link>

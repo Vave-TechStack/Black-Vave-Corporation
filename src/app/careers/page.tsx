@@ -95,8 +95,8 @@ export default function CareersPage() {
             {jobs.map((job, index) => (
               <Reveal key={job.slug} delay={index * 0.05}>
                 <div className="h-full flex flex-col p-8 border border-border bg-secondary rounded-sm hover:border-accent/40 transition-colors duration-300">
-                  <div className="flex items-start justify-between gap-4 mb-4">
-                    <h3 className="text-xl font-heading font-semibold text-text">
+                  <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
+                    <h3 className="text-xl font-heading font-semibold text-text min-w-0">
                       {job.title}
                     </h3>
                     <span className="px-3 py-1 text-xs font-semibold text-accent border border-accent/30 rounded-full shrink-0">

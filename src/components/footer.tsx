@@ -46,7 +46,7 @@ export function Footer() {
                   <li key={link.label}>
                     <Link
                       href={link.href}
-                      className="text-sm text-text-muted hover:text-accent transition-colors duration-200"
+                      className="inline-block py-1 -my-1 text-sm text-text-muted hover:text-accent transition-colors duration-200"
                     >
                       {link.label}
                     </Link>
@@ -66,7 +66,7 @@ export function Footer() {
               <Link
                 key={link.label}
                 href={link.href}
-                className="text-xs text-text-dim hover:text-accent transition-colors duration-200"
+                className="inline-block py-1 -my-1 text-xs text-text-dim hover:text-accent transition-colors duration-200"
               >
                 {link.label}
               </Link>

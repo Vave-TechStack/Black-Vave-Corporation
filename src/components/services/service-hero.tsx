@@ -65,7 +65,7 @@ export function ServiceHero({ service }: ServiceHeroProps) {
             <motion.h1
               {...fadeUp}
               transition={{ duration: 0.6, delay: 0.1 }}
-              className="text-4xl md:text-5xl lg:text-[3.4rem] font-bold text-text leading-[1.08] text-balance"
+              className="text-[31px] md:text-[43px] lg:text-[49px] font-bold text-text leading-[1.08] text-balance"
             >
               {service.hero.headline}
             </motion.h1>
@@ -73,7 +73,7 @@ export function ServiceHero({ service }: ServiceHeroProps) {
             <motion.p
               {...fadeUp}
               transition={{ duration: 0.6, delay: 0.18 }}
-              className="mt-6 text-lg md:text-xl text-text-muted leading-relaxed max-w-2xl"
+              className="mt-6 text-[13px] md:text-[15px] text-text-muted leading-relaxed max-w-2xl"
             >
               {service.hero.subheadline}
             </motion.p>

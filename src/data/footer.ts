@@ -22,9 +22,15 @@ export const footerSolutions = [
 export const footerIndustries = [
   { label: "Healthcare", href: "/industries/healthcare" },
   { label: "Education", href: "/industries/education" },
-  { label: "Retail", href: "/industries/retail-ecommerce" },
-  { label: "Publishing", href: "/industries/publishing" },
   { label: "Financial Services", href: "/industries/financial-services" },
+  { label: "Retail & E-commerce", href: "/industries/retail-ecommerce" },
+  { label: "Publishing", href: "/industries/publishing" },
+  { label: "Manufacturing", href: "/industries/manufacturing" },
+  { label: "Real Estate", href: "/industries/real-estate" },
+  { label: "Professional Services", href: "/industries/professional-services" },
+  { label: "Agriculture", href: "/industries/agriculture" },
+  { label: "Startups & SMEs", href: "/industries/startups-smes" },
+  { label: "Enterprise", href: "/industries/enterprise-organizations" },
 ];
 
 export const footerResources = [

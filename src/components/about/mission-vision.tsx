@@ -60,11 +60,11 @@ export function MissionVision() {
         </div>
 
         <Reveal>
-          <div className="rounded-sm border border-border bg-primary p-10">
+          <div className="rounded-sm border border-border bg-primary p-6 sm:p-8 md:p-10">
             <h3 className="text-2xl font-heading font-bold text-text mb-8 text-center">
               The Values We Work By
             </h3>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
               {values.map((value) => (
                 <div key={value} className="flex items-center gap-3">
                   <CheckCircle2 className="w-5 h-5 text-accent shrink-0" />

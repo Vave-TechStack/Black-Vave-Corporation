@@ -38,8 +38,8 @@ export function InsightsPreview() {
           {latest.map((article, index) => (
             <Reveal key={article.slug} delay={index * 0.08}>
               <Link href={`/insights/${article.slug}`} className="group block h-full">
-                <article className="h-full flex flex-col p-8 border border-border bg-secondary rounded-sm hover:border-accent/40 transition-colors duration-300">
-                  <div className="flex items-center gap-3 mb-6">
+                <article className="h-full flex flex-col p-6 sm:p-8 border border-border bg-secondary rounded-sm hover:border-accent/40 transition-colors duration-300">
+                  <div className="flex flex-wrap items-center gap-3 mb-6">
                     <span className="px-3 py-1 text-xs font-semibold text-accent border border-accent/30 rounded-full">
                       {article.category}
                     </span>

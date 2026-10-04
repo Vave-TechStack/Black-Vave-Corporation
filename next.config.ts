@@ -12,15 +12,33 @@ import type { NextConfig } from "next";
  * - googletagmanager.com / google-analytics.com are allowed only so the
  *   optional GA4/GTM integration (inert until env vars are configured)
  *   works when enabled.
- * - No 'unsafe-eval' anywhere.
+ * - No 'unsafe-eval' in production. `next dev` DOES require it: the dev
+ *   runtime evaluates source strings for React Fast Refresh and Framer
+ *   Motion. Without it the dev runtime throws EvalError, Framer Motion
+ *   never initialises, every <Reveal> stays at opacity 0 and the whole
+ *   site renders blank. It is therefore allowed only when NODE_ENV is
+ *   development, so the shipped build keeps the strict policy.
  */
+const isDev = process.env.NODE_ENV === "development";
+
+const SCRIPT_SRC = [
+  "'self'",
+  "'unsafe-inline'",
+  ...(isDev ? ["'unsafe-eval'"] : []),
+  "https://www.googletagmanager.com",
+  "https://www.google-analytics.com",
+].join(" ");
+
 const CONTENT_SECURITY_POLICY = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com",
+  `script-src ${SCRIPT_SRC}`,
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: https://www.google-analytics.com",
   "font-src 'self'",
-  "connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com",
+  // dev additionally needs the HMR websocket and on-demand recompile endpoint
+  `connect-src 'self' https://www.google-analytics.com https://www.googletagmanager.com${
+    isDev ? " ws: wss:" : ""
+  }`,
   "frame-src https://www.googletagmanager.com",
   "object-src 'none'",
   "base-uri 'self'",
